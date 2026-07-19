@@ -1,4 +1,4 @@
-                - RomRaider 1.1.1 JUL19 2026 -
+                - RomRaider 1.1.2 JUL19 2026 -
       Open-Source ECU Tuning and Logging -- www.romraider.com
 
 
@@ -33,7 +33,7 @@ RomRaider is still in beta status and changing frequently,
 documentation may be incomplete or out of date.
 
 --------------------------------------------
-- 1.1.1 JUL19 2026 Notes (2026-07-19) -
+- 1.1.2 JUL19 2026 Notes (2026-07-19) -
 --------------------------------------------
 This is a release of RomRaider-Linux, a fork of RomRaider that adds native
 Linux packaging (.rpm, .deb, Flatpak) and Linux UI fixes on top of the
@@ -44,7 +44,7 @@ Upstream project (Windows builds):
 https://github.com/RomRaider/RomRaider
 
 --------------------------------------
-- 1.1.1 JUL19 2026 Known Issues -
+- 1.1.2 JUL19 2026 Known Issues -
 --------------------------------------
 - Logger
   - Gauge min/max/step limits incomplete in logger.xml
@@ -59,6 +59,17 @@ Status of these items and more can be viewed at:
 --------------
 - Change Log -
 --------------
+
+1.1.2 JUL19 2026 Notes (2026-07-19)
+------------------------------------
+
+- Linux packaging
+  - Fix the .rpm/.deb packages shipping jpackage's generic default icon
+    instead of the RomRaider-Linux icon. The icon was correct in the
+    intermediate app-image but was silently dropped when that app-image
+    was packaged into the final .rpm/.deb, since jpackage doesn't reuse
+    the app-image's icon for that step unless --icon is passed again.
+
 
 1.1.1 JUL19 2026 Notes (2026-07-19)
 ------------------------------------

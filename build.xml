@@ -453,6 +453,8 @@
                 <arg value="${name.organization}" />
                 <arg value="--description" />
                 <arg value="${description.package}" />
+                <arg value="--icon" />
+                <arg value="${jpackage.icon.dir}/romraider.png" />
                 <arg value="--linux-shortcut" />
                 <arg value="--linux-menu-group" />
                 <arg value="Development;Engineering;" />
