@@ -570,6 +570,19 @@ public final class EcuLogger extends AbstractFrame implements MessageListener {
 
     private void loadLoggerConfig() {
         String loggerConfigFilePath = getSettings().getLoggerDefinitionFilePath();
+        if (isNullOrEmpty(loggerConfigFilePath)) {
+            // Auto-load if the user has dropped logger.xml into the default
+            // definitions folder, so a fresh install works without manually
+            // setting the Logger Definition Location first.
+            final File defaultDefs = new File(
+                    System.getProperty("user.home") + "/.RomRaider/definitions",
+                    "logger.xml");
+            if (defaultDefs.isFile()) {
+                loggerConfigFilePath = defaultDefs.getPath();
+                getSettings().setLoggerDefinitionFilePath(loggerConfigFilePath);
+                SettingsManager.save(getSettings());
+            }
+        }
         if (isNullOrEmpty(loggerConfigFilePath))
         	{
         		showMissingConfigDialog();

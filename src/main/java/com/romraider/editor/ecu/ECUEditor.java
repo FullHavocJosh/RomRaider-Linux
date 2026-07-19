@@ -243,6 +243,17 @@ public class ECUEditor extends AbstractFrame {
     
     public void checkDefinitions() {
         if (settings.getEcuDefinitionFiles().size() <= 0) {
+            // Auto-load if the user has dropped ecu_defs.xml into the default
+            // definitions folder, so a fresh install works without manually
+            // running the Definition Manager first.
+            final File defaultDefs = new File(
+                    System.getProperty("user.home") + "/.RomRaider/definitions",
+                    "ecu_defs.xml");
+            if (defaultDefs.isFile()) {
+                settings.addEcuDefinitionFile(defaultDefs);
+                SettingsManager.save(settings, statusPanel);
+                return;
+            }
             // no ECU definitions configured - let user choose to get latest or configure later
             Object[] options = {rb.getString("YES"), rb.getString("NO")};
             int answer = showOptionDialog(null,
