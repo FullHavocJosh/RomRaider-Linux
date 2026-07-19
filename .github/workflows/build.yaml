@@ -30,6 +30,12 @@ jobs:
           echo JRE_DIR=$JRE_DIR
           ant all
 
+      - name: Upload Windows zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: romraider-windows-zip
+          path: build/dist/windows/*.zip
+
   build-fedora:
     runs-on: ubuntu-latest
     container: fedora:latest
@@ -194,3 +200,36 @@ jobs:
         with:
           name: romraider-flatpak
           path: build/romraider.flatpak
+
+  # Only runs on a pushed tag (e.g. `git tag v1.1.0 && git push origin v1.1.0`).
+  # `on: push` with no branches/tags filter already fires for tag pushes, so
+  # every job above runs as usual; this job just gates on the ref being a tag
+  # and waits for the others to produce something to publish.
+  release:
+    needs: [build, build-fedora, build-ubuntu, build-flatpak]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease_flag=""
+          case "${{ github.ref_name }}" in
+            *-*) prerelease_flag="--prerelease" ;;
+          esac
+          gh release create "${{ github.ref_name }}" \
+            artifacts/*/* \
+            --title "RomRaider ${{ github.ref_name }}" \
+            --generate-notes \
+            $prerelease_flag
