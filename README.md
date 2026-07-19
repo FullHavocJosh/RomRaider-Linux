@@ -1,5 +1,9 @@
 # RomRaider
 
+> **Note:** This is a fork of [RomRaider/RomRaider](https://github.com/RomRaider/RomRaider)
+> that adds native Linux packaging. If you're on Windows, get the official
+> builds from the upstream repo linked above instead.
+
 RomRaider is a free, open source tuning suite created for viewing, logging and
 tuning of modern Subaru Engine Control Units. The intuitive tuning interface
 and powerful datalogger are modelled to be familiar to experienced professional
