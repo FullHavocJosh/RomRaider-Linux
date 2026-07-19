@@ -23,7 +23,6 @@ import static com.romraider.Version.PRODUCT_NAME;
 import static com.romraider.util.Platform.LINUX;
 import static com.romraider.util.Platform.MAC_OS_X;
 import static com.romraider.util.Platform.isPlatform;
-import static javax.swing.UIManager.getCrossPlatformLookAndFeelClassName;
 import static javax.swing.UIManager.getSystemLookAndFeelClassName;
 import static javax.swing.UIManager.setLookAndFeel;
 
@@ -61,9 +60,12 @@ public final class LookAndFeelManager {
     }
 
     private static String getLookAndFeel() {
-//        if (true) return "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
-        // Linux has issues with the gtk look and feel themes.
-        if (isPlatform(LINUX)) return getCrossPlatformLookAndFeelClassName();
+        // Java's "system" L&F detection only recognizes GNOME/GTK sessions on
+        // Linux, so it silently falls back to the plain Metal L&F everywhere
+        // else (KDE included) rather than throwing. Nimbus looks far less
+        // dated than Metal and, unlike GTKLookAndFeel, doesn't depend on
+        // desktop-environment detection or GTK bindings being present.
+        if (isPlatform(LINUX)) return "javax.swing.plaf.nimbus.NimbusLookAndFeel";
         return getSystemLookAndFeelClassName();
     }
 }
