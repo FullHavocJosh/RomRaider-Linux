@@ -75,12 +75,16 @@ jobs:
           echo JRE_DIR=$JRE_DIR
           ant build-linux
 
+      # The env context has no pre-populated PATH field, so
+      # `PATH: ...${{ env.PATH }}` silently evaluates to empty and clobbers
+      # the real PATH instead of prepending to it. Extend it in the shell
+      # instead, where $PATH is the real inherited environment variable.
       - name: Build .rpm
         env:
           JAVA_HOME: ${{ env.JAVA_HOME_8_X64 }}
           JRE_DIR: ${{ env.JAVA_HOME_8_X64 }}/jre
-          PATH: ${{ env.JAVA_HOME_21_X64 }}/bin:${{ env.PATH }}
         run: |
+          export PATH="$JAVA_HOME_21_X64/bin:$PATH"
           jpackage --version
           ant rpm
 
@@ -127,12 +131,16 @@ jobs:
           echo JRE_DIR=$JRE_DIR
           ant build-linux
 
+      # The env context has no pre-populated PATH field, so
+      # `PATH: ...${{ env.PATH }}` silently evaluates to empty and clobbers
+      # the real PATH instead of prepending to it. Extend it in the shell
+      # instead, where $PATH is the real inherited environment variable.
       - name: Build .deb
         env:
           JAVA_HOME: ${{ env.JAVA_HOME_8_X64 }}
           JRE_DIR: ${{ env.JAVA_HOME_8_X64 }}/jre
-          PATH: ${{ env.JAVA_HOME_21_X64 }}/bin:${{ env.PATH }}
         run: |
+          export PATH="$JAVA_HOME_21_X64/bin:$PATH"
           jpackage --version
           ant deb
 
@@ -162,12 +170,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ant imagemagick flatpak flatpak-builder
 
+      # The runner user has no polkit authorization for system-wide Flatpak
+      # changes, so --system (the default) fails with "not allowed for
+      # user" — use --user throughout instead.
       - name: Add Flathub remote
-        run: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        run: flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
 
       - name: Install Flatpak runtime, SDK, and OpenJDK extension
         run: |
-          flatpak install -y --noninteractive flathub \
+          flatpak install -y --noninteractive --user flathub \
             org.freedesktop.Platform//24.08 \
             org.freedesktop.Sdk//24.08 \
             org.freedesktop.Sdk.Extension.openjdk21//24.08
@@ -186,7 +197,7 @@ jobs:
       - name: Build Flatpak
         working-directory: packaging/flatpak
         run: |
-          flatpak-builder --force-clean --disable-rofiles-fuse \
+          flatpak-builder --force-clean --disable-rofiles-fuse --user \
             --repo=${{ github.workspace }}/build/flatpak-repo \
             ${{ github.workspace }}/build/flatpak-build \
             com.romraider.RomRaider.yml
