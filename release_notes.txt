@@ -1,4 +1,4 @@
-                - RomRaider 1.1.2 JUL19 2026 -
+                - RomRaider 1.1.3 JUL19 2026 -
       Open-Source ECU Tuning and Logging -- www.romraider.com
 
 
@@ -33,7 +33,7 @@ RomRaider is still in beta status and changing frequently,
 documentation may be incomplete or out of date.
 
 --------------------------------------------
-- 1.1.2 JUL19 2026 Notes (2026-07-19) -
+- 1.1.3 JUL19 2026 Notes (2026-07-19) -
 --------------------------------------------
 This is a release of RomRaider-Linux, a fork of RomRaider that adds native
 Linux packaging (.rpm, .deb, Flatpak) and Linux UI fixes on top of the
@@ -44,7 +44,7 @@ Upstream project (Windows builds):
 https://github.com/RomRaider/RomRaider
 
 --------------------------------------
-- 1.1.2 JUL19 2026 Known Issues -
+- 1.1.3 JUL19 2026 Known Issues -
 --------------------------------------
 - Logger
   - Gauge min/max/step limits incomplete in logger.xml
@@ -59,6 +59,18 @@ Status of these items and more can be viewed at:
 --------------
 - Change Log -
 --------------
+
+1.1.3 JUL19 2026 Notes (2026-07-19)
+------------------------------------
+
+- Linux packaging
+  - Raise the app icon resolution used for packaging: jpackage's .rpm/.deb
+    icon goes from 48x48 to 256x256, and the Flatpak now installs 64x64,
+    128x128, 256x256 and 512x512 PNG tiers plus the scalable SVG itself
+    into the hicolor icon theme, so the icon stays sharp on HiDPI displays
+    and large app-grid icon views instead of being upscaled from a small
+    bitmap.
+
 
 1.1.2 JUL19 2026 Notes (2026-07-19)
 ------------------------------------

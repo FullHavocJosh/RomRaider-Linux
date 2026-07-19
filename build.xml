@@ -356,13 +356,16 @@
              official RomRaider badge, since it's vector art (sharp at any
              size) versus the largest official RomRaider icon art available
              being only 109x104. Rendered at each size appstreamcli/hicolor
-             need for the Flatpak build's metadata to validate. -->
+             need for the Flatpak build's metadata to validate, plus a
+             256x256 romraider.png used as jpackage's icon argument (the
+             RPM/DEB installers only take a single PNG, so this is the
+             largest one used anywhere). -->
         <exec executable="convert" failonerror="true">
             <arg value="-background" />
             <arg value="none" />
             <arg value="src/main/resources/graphics/romraider-linux-icon.svg" />
             <arg value="-resize" />
-            <arg value="48x48" />
+            <arg value="256x256" />
             <arg value="${jpackage.icon.dir}/romraider.png" />
         </exec>
         <exec executable="convert" failonerror="true">
@@ -380,6 +383,14 @@
             <arg value="-resize" />
             <arg value="128x128" />
             <arg value="${jpackage.icon.dir}/romraider-128.png" />
+        </exec>
+        <exec executable="convert" failonerror="true">
+            <arg value="-background" />
+            <arg value="none" />
+            <arg value="src/main/resources/graphics/romraider-linux-icon.svg" />
+            <arg value="-resize" />
+            <arg value="512x512" />
+            <arg value="${jpackage.icon.dir}/romraider-512.png" />
         </exec>
     </target>
 

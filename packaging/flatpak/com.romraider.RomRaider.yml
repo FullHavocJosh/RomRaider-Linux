@@ -1,14 +1,15 @@
 app-id: com.romraider.RomRaider
 runtime: org.freedesktop.Platform
-runtime-version: '24.08'
+runtime-version: "24.08"
 sdk: org.freedesktop.Sdk
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.openjdk21
 command: romraider
 
 # Requires: run `ant app-image-linux` first (see build.xml) to stage
-# build/linux/app-image-input and build/linux/icon/romraider.png, which
-# this manifest packages rather than compiling from source itself.
+# build/linux/app-image-input and build/linux/icon/{romraider.png,
+# romraider-64.png,romraider-128.png,romraider-512.png}, which this
+# manifest packages rather than compiling from source itself.
 
 finish-args:
   - --share=ipc
@@ -16,9 +17,9 @@ finish-args:
   # so this needs the unconditional X11 socket rather than --socket=fallback-x11
   # (which only grants X11 when a compositor lacks Wayland support at all).
   - --socket=x11
-  - --device=dri            # hardware-accelerated 3D dyno chart (Java3D)
-  - --device=all             # serial/USB access to OBD-II / J2534 hardware
-  - --filesystem=home        # load/save tune files, definitions, logs
+  - --device=dri # hardware-accelerated 3D dyno chart (Java3D)
+  - --device=all # serial/USB access to OBD-II / J2534 hardware
+  - --filesystem=home # load/save tune files, definitions, logs
 
 build-options:
   append-path: /usr/lib/sdk/openjdk21/bin
@@ -38,6 +39,9 @@ modules:
       - install -Dm644 com.romraider.RomRaider.metainfo.xml /app/share/metainfo/com.romraider.RomRaider.metainfo.xml
       - install -Dm644 romraider-64.png /app/share/icons/hicolor/64x64/apps/com.romraider.RomRaider.png
       - install -Dm644 romraider-128.png /app/share/icons/hicolor/128x128/apps/com.romraider.RomRaider.png
+      - install -Dm644 romraider.png /app/share/icons/hicolor/256x256/apps/com.romraider.RomRaider.png
+      - install -Dm644 romraider-512.png /app/share/icons/hicolor/512x512/apps/com.romraider.RomRaider.png
+      - install -Dm644 romraider-linux-icon.svg /app/share/icons/hicolor/scalable/apps/com.romraider.RomRaider.svg
     sources:
       - type: dir
         path: ../../build/linux/app-image-input
@@ -46,6 +50,12 @@ modules:
         path: ../../build/linux/icon/romraider-64.png
       - type: file
         path: ../../build/linux/icon/romraider-128.png
+      - type: file
+        path: ../../build/linux/icon/romraider.png
+      - type: file
+        path: ../../build/linux/icon/romraider-512.png
+      - type: file
+        path: ../../src/main/resources/graphics/romraider-linux-icon.svg
       - type: file
         path: romraider-wrapper.sh
       - type: file
