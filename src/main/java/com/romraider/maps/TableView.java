@@ -939,7 +939,12 @@ public abstract class TableView extends JPanel implements Serializable {
 
     @Override
     public String getName() {
-    	return table.getName();
+        // JPanel's constructor (which runs before this.table is assigned,
+        // per normal Java construction order) calls updateUI(), and Nimbus's
+        // style-matching (unlike Metal) calls getName() as part of that,
+        // so this can be invoked with table still null while under
+        // construction.
+        return table == null ? super.getName() : table.getName();
     }
 
     public static void showBadScalePopup(Table table, Scale scale) {
