@@ -21,6 +21,7 @@ package com.romraider.swing;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.beans.PropertyVetoException;
@@ -57,6 +58,17 @@ public class MDIDesktopPane extends JDesktopPane {
     public void setBounds(int x, int y, int w, int h) {
         super.setBounds(x, y, w, h);
         checkDesktopSize();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        // Nimbus (and some other L&Fs) paint JDesktopPane's background via
+        // their own UI-default Painter, ignoring plain setBackground() calls
+        // made by ECUEditor. super.paintComponent() is exactly that
+        // UI-delegate paint, so skip it entirely rather than let it draw
+        // over this fill; a JDesktopPane has no other UI-painted content.
+        g.setColor(getBackground());
+        g.fillRect(0, 0, getWidth(), getHeight());
     }
 
     public Component add(JInternalFrame frame) {
