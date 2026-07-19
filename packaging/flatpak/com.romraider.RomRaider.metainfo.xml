@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.romraider.RomRaider</id>
+  <name>RomRaider</name>
+  <summary>ROM editing and data logging suite for Subaru ECUs</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <description>
+    <p>
+      RomRaider is a free, open source tuning suite created for viewing,
+      logging and tuning of modern Subaru Engine Control Units.
+    </p>
+  </description>
+  <launchable type="desktop-id">com.romraider.RomRaider.desktop</launchable>
+  <url type="homepage">https://www.romraider.com</url>
+  <content_rating type="oars-1.1" />
+</component>

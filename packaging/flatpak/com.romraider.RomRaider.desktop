@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=RomRaider
+Comment=RomRaider ROM Editing and Logging Suite
+Exec=romraider
+Icon=com.romraider.RomRaider
+Categories=Development;Engineering;
+Terminal=false
+Actions=Logger;
+
+[Desktop Action Logger]
+Name=RomRaider Logger
+Exec=romraider -logger
+Icon=com.romraider.RomRaider

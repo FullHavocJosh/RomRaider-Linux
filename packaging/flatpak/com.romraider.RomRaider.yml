@@ -1,0 +1,52 @@
+app-id: com.romraider.RomRaider
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.openjdk21
+command: romraider
+
+# Requires: run `ant app-image-linux` first (see build.xml) to stage
+# build/linux/app-image-input and build/linux/icon/romraider.png, which
+# this manifest packages rather than compiling from source itself.
+
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri            # hardware-accelerated 3D dyno chart (Java3D)
+  - --device=all             # serial/USB access to OBD-II / J2534 hardware
+  - --filesystem=home        # load/save tune files, definitions, logs
+
+build-options:
+  append-path: /usr/lib/sdk/openjdk21/bin
+  env:
+    JAVA_HOME: /usr/lib/sdk/openjdk21/jvm/openjdk-21
+
+modules:
+  - name: romraider
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/jre
+      - cp -a /usr/lib/sdk/openjdk21/jvm/openjdk-21/. /app/jre/
+      - mkdir -p /app/romraider
+      - cp -a app-image-input/. /app/romraider/
+      - install -Dm755 romraider-wrapper.sh /app/bin/romraider
+      - install -Dm644 com.romraider.RomRaider.desktop /app/share/applications/com.romraider.RomRaider.desktop
+      - install -Dm644 com.romraider.RomRaider.metainfo.xml /app/share/metainfo/com.romraider.RomRaider.metainfo.xml
+      - install -Dm644 romraider-64.png /app/share/icons/hicolor/64x64/apps/com.romraider.RomRaider.png
+      - install -Dm644 romraider-128.png /app/share/icons/hicolor/128x128/apps/com.romraider.RomRaider.png
+    sources:
+      - type: dir
+        path: ../../build/linux/app-image-input
+        dest: app-image-input
+      - type: file
+        path: ../../build/linux/icon/romraider-64.png
+      - type: file
+        path: ../../build/linux/icon/romraider-128.png
+      - type: file
+        path: romraider-wrapper.sh
+      - type: file
+        path: com.romraider.RomRaider.desktop
+      - type: file
+        path: com.romraider.RomRaider.metainfo.xml

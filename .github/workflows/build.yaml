@@ -29,3 +29,168 @@ jobs:
         run: |
           echo JRE_DIR=$JRE_DIR
           ant all
+
+  build-fedora:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+
+    steps:
+      - name: Install container prerequisites
+        run: dnf install -y git tar gzip
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Java 8 (compile)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          architecture: x64
+
+      - name: Setup Java 21 (jpackage)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          architecture: x64
+
+      - name: Install rpm packaging tools
+        run: dnf install -y ant rpm-build ImageMagick binutils
+
+      # Ant's -init target uses a Nashorn scriptdef (removed in JDK 15+), so
+      # `ant` itself must run under JDK 8 even though jpackage needs JDK 21.
+      - name: Build Linux jar
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_8_X64 }}
+          JRE_DIR: ${{ env.JAVA_HOME_8_X64 }}/jre
+        run: |
+          echo JRE_DIR=$JRE_DIR
+          ant build-linux
+
+      - name: Build .rpm
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_8_X64 }}
+          JRE_DIR: ${{ env.JAVA_HOME_8_X64 }}/jre
+          PATH: ${{ env.JAVA_HOME_21_X64 }}/bin:${{ env.PATH }}
+        run: |
+          jpackage --version
+          ant rpm
+
+      - name: Upload .rpm artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: romraider-fedora-rpm
+          path: build/dist/linux/*.rpm
+
+  build-ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Java 8 (compile)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          architecture: x64
+
+      - name: Setup Java 21 (jpackage)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          architecture: x64
+
+      - name: Install deb packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ant fakeroot imagemagick binutils
+
+      # Ant's -init target uses a Nashorn scriptdef (removed in JDK 15+), so
+      # `ant` itself must run under JDK 8 even though jpackage needs JDK 21.
+      - name: Build Linux jar
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_8_X64 }}
+          JRE_DIR: ${{ env.JAVA_HOME_8_X64 }}/jre
+        run: |
+          echo JRE_DIR=$JRE_DIR
+          ant build-linux
+
+      - name: Build .deb
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_8_X64 }}
+          JRE_DIR: ${{ env.JAVA_HOME_8_X64 }}/jre
+          PATH: ${{ env.JAVA_HOME_21_X64 }}/bin:${{ env.PATH }}
+        run: |
+          jpackage --version
+          ant deb
+
+      - name: Upload .deb artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: romraider-ubuntu-deb
+          path: build/dist/linux/*.deb
+
+  build-flatpak:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Java 8 (compile)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          architecture: x64
+
+      - name: Install packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ant imagemagick flatpak flatpak-builder
+
+      - name: Add Flathub remote
+        run: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+      - name: Install Flatpak runtime, SDK, and OpenJDK extension
+        run: |
+          flatpak install -y --noninteractive flathub \
+            org.freedesktop.Platform//24.08 \
+            org.freedesktop.Sdk//24.08 \
+            org.freedesktop.Sdk.Extension.openjdk21//24.08
+
+      # Ant's -init target uses a Nashorn scriptdef (removed in JDK 15+),
+      # and JDK 8 is the only JDK set up on this runner, so no override
+      # is needed here (unlike the rpm/deb jobs, jpackage isn't involved —
+      # flatpak-builder gets its JDK from the SDK extension instead).
+      - name: Stage app image
+        env:
+          JRE_DIR: ${{ env.JAVA_HOME }}/jre
+        run: |
+          echo JRE_DIR=$JRE_DIR
+          ant app-image-linux
+
+      - name: Build Flatpak
+        working-directory: packaging/flatpak
+        run: |
+          flatpak-builder --force-clean --disable-rofiles-fuse \
+            --repo=${{ github.workspace }}/build/flatpak-repo \
+            ${{ github.workspace }}/build/flatpak-build \
+            com.romraider.RomRaider.yml
+
+      - name: Bundle single-file .flatpak
+        run: |
+          flatpak build-bundle build/flatpak-repo build/romraider.flatpak com.romraider.RomRaider
+
+      - name: Upload .flatpak artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: romraider-flatpak
+          path: build/romraider.flatpak
