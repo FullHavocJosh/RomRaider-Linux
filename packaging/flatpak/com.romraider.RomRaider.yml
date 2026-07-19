@@ -12,8 +12,10 @@ command: romraider
 
 finish-args:
   - --share=ipc
-  - --socket=fallback-x11
-  - --socket=wayland
+  # Java AWT/Swing always renders through XWayland, never native Wayland,
+  # so this needs the unconditional X11 socket rather than --socket=fallback-x11
+  # (which only grants X11 when a compositor lacks Wayland support at all).
+  - --socket=x11
   - --device=dri            # hardware-accelerated 3D dyno chart (Java3D)
   - --device=all             # serial/USB access to OBD-II / J2534 hardware
   - --filesystem=home        # load/save tune files, definitions, logs
