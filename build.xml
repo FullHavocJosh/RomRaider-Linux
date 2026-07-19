@@ -371,13 +371,26 @@
         </exec>
     </target>
 
+    <!-- Several loaders (DefinitionManager.loadSequences(), the SSM/NCS learning
+         table loaders, J2534LibraryLocator) open "./customize/*.properties" via
+         a bare FileInputStream, which resolves against the JVM process's real
+         OS-level working directory. That's a native open() call, not a
+         java.io.File string computation, so -Duser.dir (a JVM property) has no
+         effect on it the way it does for ResourceUtil's File-based i18n lookup.
+         jpackage's native launcher doesn't expose a "start in" directory, so we
+         build a plain app-image first, replace each launcher binary with a
+         tiny shim that cds into the app dir for real before exec'ing the
+         renamed original binary, then package that patched app-image. -->
     <macrodef name="macro_jpackage_linux">
         <attribute name="type" />
         <sequential>
+            <property name="jpackage.appimage.dir" value="${build.dir}/linux/app-image" />
+            <delete dir="${jpackage.appimage.dir}" failonerror="false" />
             <mkdir dir="${dist.dir}/linux" />
+
             <exec executable="jpackage" failonerror="true">
                 <arg value="--type" />
-                <arg value="@{type}" />
+                <arg value="app-image" />
                 <arg value="--name" />
                 <arg value="${name.package}" />
                 <arg value="--app-version" />
@@ -396,11 +409,6 @@
                 <arg value="${class.start}" />
                 <arg value="--java-options" />
                 <arg value="-Djava.library.path=$APPDIR/lib/linux/64" />
-                <!-- ResourceUtil.getBundle() (src/main/java/com/romraider/util/ResourceUtil.java)
-                     resolves the i18n/ directory relative to the JVM's CWD via java.io.File,
-                     which honors -Duser.dir even though the native launcher doesn't chdir there. -->
-                <arg value="--java-options" />
-                <arg value="-Duser.dir=$APPDIR" />
                 <arg value="--java-options" />
                 <arg value="-Dawt.useSystemAAFontSettings=lcd" />
                 <arg value="--java-options" />
@@ -411,6 +419,28 @@
                 <arg value="-Xms64M" />
                 <arg value="--java-options" />
                 <arg value="-Xmx512M" />
+                <arg value="--dest" />
+                <arg value="${jpackage.appimage.dir}" />
+                <arg value="--add-launcher" />
+                <arg value="RomRaiderLogger=${basedir}/packaging/linux/jpackage-logger-launcher.properties" />
+            </exec>
+
+            <macro_jpackage_chdir_shim launcher="${name.package}" />
+            <macro_jpackage_chdir_shim launcher="RomRaiderLogger" />
+
+            <exec executable="jpackage" failonerror="true">
+                <arg value="--type" />
+                <arg value="@{type}" />
+                <arg value="--app-image" />
+                <arg value="${jpackage.appimage.dir}/${name.package}" />
+                <arg value="--name" />
+                <arg value="${name.package}" />
+                <arg value="--app-version" />
+                <arg value="${version.major}.${version.minor}.${version.patch}" />
+                <arg value="--vendor" />
+                <arg value="${name.organization}" />
+                <arg value="--description" />
+                <arg value="${description.package}" />
                 <arg value="--linux-shortcut" />
                 <arg value="--linux-menu-group" />
                 <arg value="Development;Engineering;" />
@@ -424,9 +454,24 @@
                 <arg value="license.txt" />
                 <arg value="--dest" />
                 <arg value="${dist.dir}/linux" />
-                <arg value="--add-launcher" />
-                <arg value="RomRaiderLogger=${basedir}/packaging/linux/jpackage-logger-launcher.properties" />
             </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="macro_jpackage_chdir_shim">
+        <attribute name="launcher" />
+        <sequential>
+            <move file="${jpackage.appimage.dir}/${name.package}/bin/@{launcher}"
+                  tofile="${jpackage.appimage.dir}/${name.package}/bin/@{launcher}.bin" />
+            <!-- The native launcher derives its .cfg filename from its own
+                 basename, so the rename above must carry the .cfg along with it. -->
+            <move file="${jpackage.appimage.dir}/${name.package}/lib/app/@{launcher}.cfg"
+                  tofile="${jpackage.appimage.dir}/${name.package}/lib/app/@{launcher}.bin.cfg" />
+            <echo file="${jpackage.appimage.dir}/${name.package}/bin/@{launcher}"><![CDATA[#!/bin/sh
+cd "$(dirname "$0")/../lib/app" || exit 1
+exec "$(dirname "$0")/@{launcher}.bin" "$@"
+]]></echo>
+            <chmod file="${jpackage.appimage.dir}/${name.package}/bin/@{launcher}" perm="755" />
         </sequential>
     </macrodef>
 
