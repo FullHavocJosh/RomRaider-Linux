@@ -1,6 +1,6 @@
 name: RomRaider build
 
-on: [push,pull_request]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
       - name: Setup Java 8
         uses: actions/setup-java@v1.4.3
         with:
-          java-version: '8'
+          java-version: "8"
           java-package: jdk
           architecture: x64
       - name: set JRE_DIR environment variable
@@ -30,12 +30,6 @@ jobs:
           echo JRE_DIR=$JRE_DIR
           ant all
 
-      - name: Upload Windows zip artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: romraider-windows-zip
-          path: build/dist/windows/*.zip
-
   build-fedora:
     runs-on: ubuntu-latest
     container: fedora:latest
@@ -51,15 +45,15 @@ jobs:
       - name: Setup Java 8 (compile)
         uses: actions/setup-java@v4
         with:
-          java-version: '8'
-          distribution: 'temurin'
+          java-version: "8"
+          distribution: "temurin"
           architecture: x64
 
       - name: Setup Java 21 (jpackage)
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: "temurin"
           architecture: x64
 
       - name: Install rpm packaging tools
@@ -105,15 +99,15 @@ jobs:
       - name: Setup Java 8 (compile)
         uses: actions/setup-java@v4
         with:
-          java-version: '8'
-          distribution: 'temurin'
+          java-version: "8"
+          distribution: "temurin"
           architecture: x64
 
       - name: Setup Java 21 (jpackage)
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: "temurin"
           architecture: x64
 
       - name: Install deb packaging tools
@@ -161,8 +155,8 @@ jobs:
       - name: Setup Java 8 (compile)
         uses: actions/setup-java@v4
         with:
-          java-version: '8'
-          distribution: 'temurin'
+          java-version: "8"
+          distribution: "temurin"
           architecture: x64
 
       - name: Install packaging tools
@@ -215,9 +209,12 @@ jobs:
   # Only runs on a pushed tag (e.g. `git tag v1.1.0 && git push origin v1.1.0`).
   # `on: push` with no branches/tags filter already fires for tag pushes, so
   # every job above runs as usual; this job just gates on the ref being a tag
-  # and waits for the others to produce something to publish.
+  # and waits for the Linux jobs to produce something to publish. Windows
+  # isn't included in releases here — get Windows builds from the upstream
+  # RomRaider/RomRaider repo instead; the `build` job above still runs on
+  # every push/PR as a compile check, it just isn't a release input.
   release:
-    needs: [build, build-fedora, build-ubuntu, build-flatpak]
+    needs: [build-fedora, build-ubuntu, build-flatpak]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
