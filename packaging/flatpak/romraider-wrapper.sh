@@ -10,6 +10,10 @@ for jar in "$APPDIR"/lib/common/*.jar; do
     CP="$CP:$jar"
 done
 
+# ResourceUtil.getBundle() (src/main/java/com/romraider/util/ResourceUtil.java)
+# resolves the i18n/ directory relative to the process CWD, not the classpath.
+cd "$APPDIR"
+
 exec /app/jre/bin/java \
     -Djava.library.path="$APPDIR/lib/linux/64" \
     -Dawt.useSystemAAFontSettings=lcd \

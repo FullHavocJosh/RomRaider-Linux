@@ -396,6 +396,11 @@
                 <arg value="${class.start}" />
                 <arg value="--java-options" />
                 <arg value="-Djava.library.path=$APPDIR/lib/linux/64" />
+                <!-- ResourceUtil.getBundle() (src/main/java/com/romraider/util/ResourceUtil.java)
+                     resolves the i18n/ directory relative to the JVM's CWD via java.io.File,
+                     which honors -Duser.dir even though the native launcher doesn't chdir there. -->
+                <arg value="--java-options" />
+                <arg value="-Duser.dir=$APPDIR" />
                 <arg value="--java-options" />
                 <arg value="-Dawt.useSystemAAFontSettings=lcd" />
                 <arg value="--java-options" />
