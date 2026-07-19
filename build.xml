@@ -349,22 +349,34 @@
             <fileset dir="i18n" />
         </copy>
 
-        <!-- jpackage needs a PNG icon on Linux; convert the existing ICO.
-             Also emit larger sizes (upscaled from the 48x48 source) since
-             appstreamcli requires a hicolor icon at 64x64 or larger for the
-             Flatpak build's metadata to validate. -->
+        <!-- jpackage needs a PNG icon on Linux. romraider-linux-icon.svg is a
+             CC0/public-domain "radar" icon (Wikimedia Commons, by
+             WhoAteMyButter: https://commons.wikimedia.org/wiki/File:Radar_icon_red.svg),
+             used here as the RomRaider-Linux app icon instead of the
+             official RomRaider badge, since it's vector art (sharp at any
+             size) versus the largest official RomRaider icon art available
+             being only 109x104. Rendered at each size appstreamcli/hicolor
+             need for the Flatpak build's metadata to validate. -->
         <exec executable="convert" failonerror="true">
-            <arg value="src/main/resources/graphics/romraider-ico.ico" />
+            <arg value="-background" />
+            <arg value="none" />
+            <arg value="src/main/resources/graphics/romraider-linux-icon.svg" />
+            <arg value="-resize" />
+            <arg value="48x48" />
             <arg value="${jpackage.icon.dir}/romraider.png" />
         </exec>
         <exec executable="convert" failonerror="true">
-            <arg value="src/main/resources/graphics/romraider-ico.ico" />
+            <arg value="-background" />
+            <arg value="none" />
+            <arg value="src/main/resources/graphics/romraider-linux-icon.svg" />
             <arg value="-resize" />
             <arg value="64x64" />
             <arg value="${jpackage.icon.dir}/romraider-64.png" />
         </exec>
         <exec executable="convert" failonerror="true">
-            <arg value="src/main/resources/graphics/romraider-ico.ico" />
+            <arg value="-background" />
+            <arg value="none" />
+            <arg value="src/main/resources/graphics/romraider-linux-icon.svg" />
             <arg value="-resize" />
             <arg value="128x128" />
             <arg value="${jpackage.icon.dir}/romraider-128.png" />
