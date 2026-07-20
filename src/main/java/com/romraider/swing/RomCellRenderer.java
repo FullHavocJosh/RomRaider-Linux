@@ -53,10 +53,16 @@ public class RomCellRenderer implements TreeCellRenderer {
         fileName = new JLabel(" ");
         fileName.setFont(new Font("Tahoma", Font.BOLD, 11));
         fileName.setHorizontalAlignment(JLabel.CENTER);
+        // These labels sit on a hardcoded light background (see below), so
+        // the text color needs to be hardcoded dark too rather than
+        // inherited from the L&F default, which is light under GTK's dark
+        // theme and unreadable against a light background.
+        fileName.setForeground(Color.BLACK);
 
         carInfo = new JLabel(" ");
         carInfo.setFont(new Font("Tahoma", Font.PLAIN, 10));
         carInfo.setHorizontalAlignment(JLabel.CENTER);
+        carInfo.setForeground(Color.BLACK);
     }
     
     public static ImageIcon getIconForTable(Table t) {   	
@@ -161,6 +167,10 @@ public class RomCellRenderer implements TreeCellRenderer {
             // set color
             renderer.add(tableName);
             tableName.setFont(new Font("Tahoma", Font.PLAIN, 11));
+            // This label sits on a hardcoded white background (see above),
+            // so hardcode dark text too rather than inheriting the L&F
+            // default, which is light under GTK's dark theme.
+            tableName.setForeground(Color.BLACK);
 
             if (selected) {
                 renderer.setBackground(new Color(220, 220, 255));

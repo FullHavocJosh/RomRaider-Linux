@@ -29,6 +29,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -45,6 +46,11 @@ public class RomTree extends JTree implements MouseListener {
         super(input);
         setRootVisible(false);
         setRowHeight(0);
+        // GTKLookAndFeel doesn't always pick up the active GTK theme's real
+        // treeview background (predates GTK3 CSS theming), leaving JTree on
+        // a hardcoded white regardless of a dark theme. Match the panel
+        // background explicitly instead of trusting the L&F's tree default.
+        setBackground(UIManager.getColor("Panel.background"));
         addMouseListener(this);
         setCellRenderer(new RomCellRenderer());
         setFont(new Font("Tahoma", Font.PLAIN, 11));

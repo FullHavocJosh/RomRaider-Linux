@@ -160,7 +160,12 @@ public class ECUEditor extends AbstractFrame {
         
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
         		leftAreaWithFilterBox, rightScrollPane);
-        splitPane.setDividerSize(3);
+        // 3px left barely any actual grabbable hit-area once the active
+        // L&F's divider UI delegate reserves part of it for its own
+        // rendering/border (worst under GTKLookAndFeel, where it was only
+        // reliably draggable within a stray 1-2px sliver). 6px keeps the
+        // divider visually thin while giving it a comfortable hit target.
+        splitPane.setDividerSize(6);
         splitPane.setDividerLocation(settings.getSplitPaneLocation());
         splitPane.addPropertyChangeListener(this);
         splitPane.setContinuousLayout(true);

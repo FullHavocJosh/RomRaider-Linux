@@ -1,4 +1,4 @@
-                - RomRaider 1.1.4 JUL20 2026 -
+                - RomRaider 1.1.5 JUL20 2026 -
       Open-Source ECU Tuning and Logging -- www.romraider.com
 
 
@@ -33,7 +33,7 @@ RomRaider is still in beta status and changing frequently,
 documentation may be incomplete or out of date.
 
 --------------------------------------------
-- 1.1.4 JUL20 2026 Notes (2026-07-20) -
+- 1.1.5 JUL20 2026 Notes (2026-07-20) -
 --------------------------------------------
 This is a release of RomRaider-Linux, a fork of RomRaider that adds native
 Linux packaging (.rpm, .deb, Flatpak) and Linux UI fixes on top of the
@@ -44,7 +44,7 @@ Upstream project (Windows builds):
 https://github.com/RomRaider/RomRaider
 
 --------------------------------------
-- 1.1.4 JUL20 2026 Known Issues -
+- 1.1.5 JUL20 2026 Known Issues -
 --------------------------------------
 - Logger
   - Gauge min/max/step limits incomplete in logger.xml
@@ -59,6 +59,30 @@ Status of these items and more can be viewed at:
 --------------
 - Change Log -
 --------------
+
+1.1.5 JUL20 2026 Notes (2026-07-20)
+------------------------------------
+
+- Linux UI
+  - Switch the default Linux look and feel from Nimbus to GTKLookAndFeel.
+    KDE ships its own GTK theme integration (breeze-gtk/kde-gtk-config), so
+    this now renders as a proper native dark/light theme matching the
+    desktop, not just under GNOME.
+  - Fix the ECU definition tree's text being unreadable against its own
+    hardcoded background colors under a dark theme (the top-level ROM
+    entry and individual table entries hardcode light backgrounds but
+    never set an explicit text color, so they inherited the L&F's light
+    default text color instead of contrasting against it).
+  - Fix the ECU Editor and Logger windows not resizing their contents when
+    maximized. Some XWayland/compositor setups notify the app that the
+    window became maximized without ever sending the window's new
+    geometry, leaving Swing's layout pinned to the pre-maximize size even
+    though the window itself visibly grew; the app now detects that
+    mismatch and corrects its own bounds.
+  - Widen the ECU Editor's tree/table splitter from a 3px to a 6px hit
+    target, since the old one was only reliably draggable within a 1-2px
+    sliver once the active L&F's divider rendering ate into it.
+
 
 1.1.4 JUL20 2026 Notes (2026-07-20)
 ------------------------------------

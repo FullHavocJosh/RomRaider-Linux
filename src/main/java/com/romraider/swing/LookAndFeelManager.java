@@ -26,8 +26,11 @@ import static com.romraider.util.Platform.isPlatform;
 import static javax.swing.UIManager.getSystemLookAndFeelClassName;
 import static javax.swing.UIManager.setLookAndFeel;
 
+import java.awt.Insets;
+
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.UIManager;
 
 import org.apache.log4j.Logger;
 
@@ -50,6 +53,16 @@ public final class LookAndFeelManager {
 
             setLookAndFeel(getLookAndFeel());
 
+            // GTKLookAndFeel's buttons carry noticeably more padding than
+            // Nimbus/Metal by default, which pushes the toolbars (laid out
+            // with FlowLayout and fixed button-count rows tuned for the
+            // narrower L&Fs) wide enough to wrap onto a second row. Tighten
+            // the default margin globally so button sizing stays close to
+            // what those toolbars were tuned for.
+            if (isPlatform(LINUX)) {
+                UIManager.put("Button.margin", new Insets(1, 1, 1, 1));
+            }
+
             // make sure we have nice window decorations.
             JFrame.setDefaultLookAndFeelDecorated(true);
             JDialog.setDefaultLookAndFeelDecorated(true);
@@ -60,12 +73,13 @@ public final class LookAndFeelManager {
     }
 
     private static String getLookAndFeel() {
-        // Java's "system" L&F detection only recognizes GNOME/GTK sessions on
-        // Linux, so it silently falls back to the plain Metal L&F everywhere
-        // else (KDE included) rather than throwing. Nimbus looks far less
-        // dated than Metal and, unlike GTKLookAndFeel, doesn't depend on
-        // desktop-environment detection or GTK bindings being present.
-        if (isPlatform(LINUX)) return "javax.swing.plaf.nimbus.NimbusLookAndFeel";
+        // Java's "system" L&F detection only recognizes GNOME/GTK sessions
+        // on Linux, so it silently falls back to the plain Metal L&F
+        // everywhere else (KDE included) rather than throwing. Force
+        // GTKLookAndFeel instead: KDE ships its own GTK theme integration
+        // (breeze-gtk/kde-gtk-config), so this renders as a proper native
+        // dark/light theme there too, not just under GNOME.
+        if (isPlatform(LINUX)) return "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
         return getSystemLookAndFeelClassName();
     }
 }

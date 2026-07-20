@@ -20,9 +20,13 @@
 package com.romraider.swing;
 
 import javax.swing.JFrame;
+import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -30,10 +34,46 @@ import java.beans.PropertyChangeListener;
 public abstract class AbstractFrame extends JFrame implements WindowListener, PropertyChangeListener {
     public AbstractFrame() throws HeadlessException {
         super();
+        installMaximizeResizeWorkaround();
     }
 
     public AbstractFrame(String arg0) throws HeadlessException {
         super(arg0);
+        installMaximizeResizeWorkaround();
+    }
+
+    // Some XWayland/compositor setups (seen under a KDE Plasma Wayland
+    // session) deliver the WINDOW_STATE_CHANGED notification when the
+    // window manager maximizes a window, but never send the corresponding
+    // ConfigureNotify with the new geometry. That leaves AWT's own
+    // size/bounds model stuck at the pre-maximize size even though the
+    // window is now visibly maximized, so Swing's layout never re-flows
+    // into the new space. Detect that mismatch and force the frame's
+    // bounds back in sync with the real maximized screen area.
+    private void installMaximizeResizeWorkaround() {
+        addWindowStateListener(new WindowStateListener() {
+            @Override
+            public void windowStateChanged(WindowEvent e) {
+                if ((e.getNewState() & MAXIMIZED_BOTH) != MAXIMIZED_BOTH) {
+                    return;
+                }
+                GraphicsConfiguration gc = getGraphicsConfiguration();
+                if (gc == null) {
+                    return;
+                }
+                Rectangle screenBounds = gc.getBounds();
+                Insets screenInsets = getToolkit().getScreenInsets(gc);
+                Rectangle maximizedBounds = new Rectangle(
+                        screenBounds.x + screenInsets.left,
+                        screenBounds.y + screenInsets.top,
+                        screenBounds.width - screenInsets.left - screenInsets.right,
+                        screenBounds.height - screenInsets.top - screenInsets.bottom);
+                if (!getBounds().equals(maximizedBounds)) {
+                    setBounds(maximizedBounds);
+                    validate();
+                }
+            }
+        });
     }
 
     private static final long serialVersionUID = 7948304087075622157L;
