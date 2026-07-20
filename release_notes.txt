@@ -1,4 +1,4 @@
-                - RomRaider 1.1.3 JUL19 2026 -
+                - RomRaider 1.1.4 JUL20 2026 -
       Open-Source ECU Tuning and Logging -- www.romraider.com
 
 
@@ -33,7 +33,7 @@ RomRaider is still in beta status and changing frequently,
 documentation may be incomplete or out of date.
 
 --------------------------------------------
-- 1.1.3 JUL19 2026 Notes (2026-07-19) -
+- 1.1.4 JUL20 2026 Notes (2026-07-20) -
 --------------------------------------------
 This is a release of RomRaider-Linux, a fork of RomRaider that adds native
 Linux packaging (.rpm, .deb, Flatpak) and Linux UI fixes on top of the
@@ -44,7 +44,7 @@ Upstream project (Windows builds):
 https://github.com/RomRaider/RomRaider
 
 --------------------------------------
-- 1.1.3 JUL19 2026 Known Issues -
+- 1.1.4 JUL20 2026 Known Issues -
 --------------------------------------
 - Logger
   - Gauge min/max/step limits incomplete in logger.xml
@@ -59,6 +59,20 @@ Status of these items and more can be viewed at:
 --------------
 - Change Log -
 --------------
+
+1.1.4 JUL20 2026 Notes (2026-07-20)
+------------------------------------
+
+- Linux packaging
+  - Fix the app icon rendering as a broken sliver (missing the circular
+    background and most of the artwork) in the .deb and Flatpak builds.
+    Both are built on Ubuntu runners, whose "imagemagick" apt package is
+    still ImageMagick 6, which mis-renders this icon's SVG gradients/
+    filters at every size; the .rpm was unaffected since Fedora's dnf
+    package is ImageMagick 7. Icon rasterization now uses rsvg-convert
+    (a dedicated SVG renderer) instead of ImageMagick on all platforms,
+    which doesn't have this bug in either ImageMagick version.
+
 
 1.1.3 JUL19 2026 Notes (2026-07-19)
 ------------------------------------

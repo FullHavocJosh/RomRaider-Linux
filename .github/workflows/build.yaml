@@ -57,7 +57,7 @@ jobs:
           architecture: x64
 
       - name: Install rpm packaging tools
-        run: dnf install -y ant rpm-build ImageMagick binutils
+        run: dnf install -y ant rpm-build librsvg2-tools binutils
 
       # Ant's -init target uses a Nashorn scriptdef (removed in JDK 15+), so
       # `ant` itself must run under JDK 8 even though jpackage needs JDK 21.
@@ -113,7 +113,7 @@ jobs:
       - name: Install deb packaging tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y ant fakeroot imagemagick binutils
+          sudo apt-get install -y ant fakeroot librsvg2-bin binutils
 
       # Ant's -init target uses a Nashorn scriptdef (removed in JDK 15+), so
       # `ant` itself must run under JDK 8 even though jpackage needs JDK 21.
@@ -162,7 +162,7 @@ jobs:
       - name: Install packaging tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y ant imagemagick flatpak flatpak-builder
+          sudo apt-get install -y ant librsvg2-bin flatpak flatpak-builder
 
       # The runner user has no polkit authorization for system-wide Flatpak
       # changes, so --system (the default) fails with "not allowed for

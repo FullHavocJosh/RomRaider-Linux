@@ -359,38 +359,52 @@
              need for the Flatpak build's metadata to validate, plus a
              256x256 romraider.png used as jpackage's icon argument (the
              RPM/DEB installers only take a single PNG, so this is the
-             largest one used anywhere). -->
-        <exec executable="convert" failonerror="true">
-            <arg value="-background" />
-            <arg value="none" />
-            <arg value="src/main/resources/graphics/romraider-linux-icon.svg" />
-            <arg value="-resize" />
-            <arg value="256x256" />
+             largest one used anywhere).
+
+             Rasterized with rsvg-convert rather than ImageMagick's convert:
+             ImageMagick 6 (still what Ubuntu's "imagemagick" apt package
+             installs) mis-renders this SVG's gradient/filter defs at every
+             size, silently dropping most shapes and leaving only a sliver
+             of the icon behind. ImageMagick 7 (Fedora's dnf package)
+             renders it fine, so this only broke the .deb and Flatpak
+             builds (both built on Ubuntu runners), not the .rpm. librsvg
+             is a dedicated SVG renderer and doesn't have this bug on
+             either distro. -->
+        <exec executable="rsvg-convert" failonerror="true">
+            <arg value="-w" />
+            <arg value="256" />
+            <arg value="-h" />
+            <arg value="256" />
+            <arg value="-o" />
             <arg value="${jpackage.icon.dir}/romraider.png" />
-        </exec>
-        <exec executable="convert" failonerror="true">
-            <arg value="-background" />
-            <arg value="none" />
             <arg value="src/main/resources/graphics/romraider-linux-icon.svg" />
-            <arg value="-resize" />
-            <arg value="64x64" />
+        </exec>
+        <exec executable="rsvg-convert" failonerror="true">
+            <arg value="-w" />
+            <arg value="64" />
+            <arg value="-h" />
+            <arg value="64" />
+            <arg value="-o" />
             <arg value="${jpackage.icon.dir}/romraider-64.png" />
-        </exec>
-        <exec executable="convert" failonerror="true">
-            <arg value="-background" />
-            <arg value="none" />
             <arg value="src/main/resources/graphics/romraider-linux-icon.svg" />
-            <arg value="-resize" />
-            <arg value="128x128" />
+        </exec>
+        <exec executable="rsvg-convert" failonerror="true">
+            <arg value="-w" />
+            <arg value="128" />
+            <arg value="-h" />
+            <arg value="128" />
+            <arg value="-o" />
             <arg value="${jpackage.icon.dir}/romraider-128.png" />
-        </exec>
-        <exec executable="convert" failonerror="true">
-            <arg value="-background" />
-            <arg value="none" />
             <arg value="src/main/resources/graphics/romraider-linux-icon.svg" />
-            <arg value="-resize" />
-            <arg value="512x512" />
+        </exec>
+        <exec executable="rsvg-convert" failonerror="true">
+            <arg value="-w" />
+            <arg value="512" />
+            <arg value="-h" />
+            <arg value="512" />
+            <arg value="-o" />
             <arg value="${jpackage.icon.dir}/romraider-512.png" />
+            <arg value="src/main/resources/graphics/romraider-linux-icon.svg" />
         </exec>
     </target>
 
