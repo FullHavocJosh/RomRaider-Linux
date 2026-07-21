@@ -19,8 +19,6 @@
 
 package com.romraider.swing;
 
-import static javax.swing.BorderFactory.createLineBorder;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -31,6 +29,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
@@ -43,26 +42,20 @@ public class RomCellRenderer implements TreeCellRenderer {
     JLabel fileName;
     JLabel carInfo;
     DefaultTreeCellRenderer defaultRenderer = new DefaultTreeCellRenderer();
-    
+
     static ImageIcon icon1D = new ImageIcon(RomCellRenderer.class.getResource("/graphics/1d.gif"));
     static ImageIcon icon2D = new ImageIcon(RomCellRenderer.class.getResource("/graphics/2d.gif"));
     static ImageIcon icon3D = new ImageIcon(RomCellRenderer.class.getResource("/graphics/3d.gif"));
     static ImageIcon iconSwitch = new ImageIcon(RomCellRenderer.class.getResource("/graphics/switch.gif"));
-    
+
     public RomCellRenderer() {
         fileName = new JLabel(" ");
         fileName.setFont(new Font("Tahoma", Font.BOLD, 11));
         fileName.setHorizontalAlignment(JLabel.CENTER);
-        // These labels sit on a hardcoded light background (see below), so
-        // the text color needs to be hardcoded dark too rather than
-        // inherited from the L&F default, which is light under GTK's dark
-        // theme and unreadable against a light background.
-        fileName.setForeground(Color.BLACK);
 
         carInfo = new JLabel(" ");
         carInfo.setFont(new Font("Tahoma", Font.PLAIN, 10));
         carInfo.setHorizontalAlignment(JLabel.CENTER);
-        carInfo.setForeground(Color.BLACK);
     }
     
     public static ImageIcon getIconForTable(Table t) {   	
@@ -141,13 +134,22 @@ public class RomCellRenderer implements TreeCellRenderer {
             renderer.add(fileName);
             renderer.add(carInfo);
 
+            // Use the tree's own selection/text colors (which the active
+            // L&F derives from the OS theme) instead of hardcoded pastel
+            // colors, so this stays readable under both light and dark
+            // themes instead of only the light theme these were tuned for.
             if (selected) {
-                renderer.setBackground(new Color(220, 220, 255));
-                renderer.setBorder(createLineBorder(new Color(0, 0, 225)));
-
+                renderer.setOpaque(true);
+                Color selectionBg = UIManager.getColor("Tree.selectionBackground");
+                Color selectionFg = UIManager.getColor("Tree.selectionForeground");
+                renderer.setBackground(selectionBg);
+                fileName.setForeground(selectionFg);
+                carInfo.setForeground(selectionFg);
             } else {
-                renderer.setBorder(createLineBorder(new Color(220, 0, 0)));
-                renderer.setBackground(new Color(255, 210, 210));
+                renderer.setOpaque(false);
+                Color textFg = UIManager.getColor("Tree.textForeground");
+                fileName.setForeground(textFg);
+                carInfo.setForeground(textFg);
             }
 
             renderer.setPreferredSize(new Dimension(tree.getParent().getWidth(), 30));
@@ -158,31 +160,33 @@ public class RomCellRenderer implements TreeCellRenderer {
 
             Table table = (Table) (((TableTreeNode)(value)).getUserObject());
             JPanel renderer = new JPanel(new GridLayout(1, 1));
-            renderer.setBorder(createLineBorder(Color.WHITE));
-            JLabel tableName = new JLabel("");
-            renderer.setBackground(Color.WHITE);
-            
-            tableName = new JLabel (table.getName() + " ", getIconForTable(table), JLabel.LEFT);
-
-            // set color
+            JLabel tableName = new JLabel (table.getName() + " ", getIconForTable(table), JLabel.LEFT);
             renderer.add(tableName);
             tableName.setFont(new Font("Tahoma", Font.PLAIN, 11));
-            // This label sits on a hardcoded white background (see above),
-            // so hardcode dark text too rather than inheriting the L&F
-            // default, which is light under GTK's dark theme.
-            tableName.setForeground(Color.BLACK);
 
+            // Use the tree's own selection/text colors (which the active
+            // L&F derives from the OS theme) instead of hardcoded white/
+            // black/pastel colors, so this stays readable under both light
+            // and dark themes instead of only the light theme these were
+            // tuned for.
             if (selected) {
-                renderer.setBackground(new Color(220, 220, 255));
-                renderer.setBorder(createLineBorder(new Color(0, 0, 225)));
+                renderer.setOpaque(true);
+                renderer.setBackground(UIManager.getColor("Tree.selectionBackground"));
+                tableName.setForeground(UIManager.getColor("Tree.selectionForeground"));
+            } else {
+                renderer.setOpaque(false);
+                tableName.setForeground(UIManager.getColor("Tree.textForeground"));
             }
 
             if (table.getUserLevel() == 5) {
-                tableName.setForeground(new Color(255, 150, 150));
+                // A fixed mid-tone red rather than a light pink: this label
+                // no longer sits on a fixed white background, so it now
+                // needs to read against either a light or dark tree
+                // background depending on the OS theme.
+                tableName.setForeground(new Color(200, 60, 60));
                 tableName.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
             } else if (table.getUserLevel() > table.getSettings().getUserLevel()) {
-                //tableName.setForeground(new Color(185, 185, 185));
                 tableName.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
             }

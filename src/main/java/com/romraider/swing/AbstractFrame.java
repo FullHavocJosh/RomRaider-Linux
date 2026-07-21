@@ -20,6 +20,7 @@
 package com.romraider.swing;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
 import java.awt.Insets;
@@ -57,21 +58,35 @@ public abstract class AbstractFrame extends JFrame implements WindowListener, Pr
                 if ((e.getNewState() & MAXIMIZED_BOTH) != MAXIMIZED_BOTH) {
                     return;
                 }
-                GraphicsConfiguration gc = getGraphicsConfiguration();
-                if (gc == null) {
-                    return;
-                }
-                Rectangle screenBounds = gc.getBounds();
-                Insets screenInsets = getToolkit().getScreenInsets(gc);
-                Rectangle maximizedBounds = new Rectangle(
-                        screenBounds.x + screenInsets.left,
-                        screenBounds.y + screenInsets.top,
-                        screenBounds.width - screenInsets.left - screenInsets.right,
-                        screenBounds.height - screenInsets.top - screenInsets.bottom);
-                if (!getBounds().equals(maximizedBounds)) {
-                    setBounds(maximizedBounds);
-                    validate();
-                }
+                // Defer to the next event-dispatch cycle: this can fire
+                // before the frame's menu bar/toolbar/content have been
+                // fully built (e.g. ECUEditor's constructor returns and
+                // shows the frame before ECUExec calls
+                // initializeEditorUI() on it), and correcting the bounds
+                // against a still-incomplete component tree left the
+                // window blank rather than fixed.
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        GraphicsConfiguration gc = getGraphicsConfiguration();
+                        if (gc == null) {
+                            return;
+                        }
+                        Rectangle screenBounds = gc.getBounds();
+                        Insets screenInsets = getToolkit().getScreenInsets(gc);
+                        Rectangle maximizedBounds = new Rectangle(
+                                screenBounds.x + screenInsets.left,
+                                screenBounds.y + screenInsets.top,
+                                screenBounds.width - screenInsets.left - screenInsets.right,
+                                screenBounds.height - screenInsets.top - screenInsets.bottom);
+                        if (!getBounds().equals(maximizedBounds)) {
+                            setBounds(maximizedBounds);
+                            invalidate();
+                            validate();
+                            repaint();
+                        }
+                    }
+                });
             }
         });
     }

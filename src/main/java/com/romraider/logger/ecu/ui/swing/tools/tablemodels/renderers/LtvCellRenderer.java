@@ -51,8 +51,11 @@ public class LtvCellRenderer extends DefaultTableCellRenderer {
         if (c instanceof JLabel) {
             final JLabel cell = (JLabel) c;
             cell.setHorizontalAlignment(JLabel.CENTER);
-            cell.setForeground(Color.BLACK);
-    
+            // Leave the L&F/table-derived default foreground in place here
+            // rather than hardcoding black: setColour() below only overrides
+            // it for non-zero values, so a fixed black default would go
+            // unreadable against a dark theme's dark cell background.
+
             if (column > 0) {
                 if (value instanceof Double) {
                     cell.setText(numberFormat.format(value));

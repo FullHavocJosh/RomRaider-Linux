@@ -81,9 +81,6 @@ public class SettingsForm extends JFrame implements MouseListener {
         btnCancel.addMouseListener(this);
         btnChooseFont.addMouseListener(this);
         reset.addMouseListener(this);
-
-        tableClickCount.setBackground(Color.WHITE);
-        tableClickBehavior.setBackground(Color.WHITE);
     }
 
     private void initSettings() {

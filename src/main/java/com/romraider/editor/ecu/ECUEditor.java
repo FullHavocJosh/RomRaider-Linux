@@ -144,9 +144,6 @@ public class ECUEditor extends AbstractFrame {
 
         setSize(settings.getWindowSize());
         setLocation(settings.getWindowLocation());
-        if (settings.isWindowMaximized()) {
-            setExtendedState(MAXIMIZED_BOTH);
-        }
 
         rightScrollPane = new JScrollPane(rightPanel,
                 VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -163,9 +160,10 @@ public class ECUEditor extends AbstractFrame {
         // 3px left barely any actual grabbable hit-area once the active
         // L&F's divider UI delegate reserves part of it for its own
         // rendering/border (worst under GTKLookAndFeel, where it was only
-        // reliably draggable within a stray 1-2px sliver). 6px keeps the
-        // divider visually thin while giving it a comfortable hit target.
-        splitPane.setDividerSize(6);
+        // reliably draggable within a stray 1-2px sliver, and even 6px was
+        // still reported as hard to grab). 10px is a comfortable, easy-to-
+        // hit target matching what most desktop apps use for splitters.
+        splitPane.setDividerSize(10);
         splitPane.setDividerLocation(settings.getSplitPaneLocation());
         splitPane.addPropertyChangeListener(this);
         splitPane.setContinuousLayout(true);
@@ -184,6 +182,20 @@ public class ECUEditor extends AbstractFrame {
         setTitle(titleText);
         setVisible(true);
         toFront();
+
+        if (settings.isWindowMaximized()) {
+            // Requested after setVisible(true) rather than before, which is
+            // the more conventional order. NOTE: on some XWayland/compositor
+            // setups this alone doesn't fully avoid a known issue where
+            // starting up already maximized (or otherwise larger than the
+            // default 800x600) can render a blank window; toggling maximize
+            // once by hand recovers it. Root cause not yet isolated -- it
+            // reproduces even with no application code involved in the
+            // maximize request timing, so it looks like an environment-level
+            // rendering issue tied to the initial window size rather than
+            // anything specific to how/when this is called.
+            setExtendedState(MAXIMIZED_BOTH);
+        }
     }
 
     public void initializeEditorUI() {

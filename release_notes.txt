@@ -1,4 +1,4 @@
-                - RomRaider 1.1.5 JUL20 2026 -
+                - RomRaider 1.1.6 JUL20 2026 -
       Open-Source ECU Tuning and Logging -- www.romraider.com
 
 
@@ -33,7 +33,7 @@ RomRaider is still in beta status and changing frequently,
 documentation may be incomplete or out of date.
 
 --------------------------------------------
-- 1.1.5 JUL20 2026 Notes (2026-07-20) -
+- 1.1.6 JUL20 2026 Notes (2026-07-20) -
 --------------------------------------------
 This is a release of RomRaider-Linux, a fork of RomRaider that adds native
 Linux packaging (.rpm, .deb, Flatpak) and Linux UI fixes on top of the
@@ -44,8 +44,14 @@ Upstream project (Windows builds):
 https://github.com/RomRaider/RomRaider
 
 --------------------------------------
-- 1.1.5 JUL20 2026 Known Issues -
+- 1.1.6 JUL20 2026 Known Issues -
 --------------------------------------
+- Editor / Logger (Linux)
+  - On some XWayland/compositor setups, if the window was maximized when
+    last closed, it can start back up blank on the next launch. Un-
+    maximizing and re-maximizing the window (or just resizing it) recovers
+    it. Root cause looks environment-level (tied to a large initial window
+    size at startup) rather than anything specific to RomRaider itself.
 - Logger
   - Gauge min/max/step limits incomplete in logger.xml
   - ECU connections under Linux are flaky (start the logger after
@@ -59,6 +65,22 @@ Status of these items and more can be viewed at:
 --------------
 - Change Log -
 --------------
+
+1.1.6 JUL20 2026 Notes (2026-07-20)
+------------------------------------
+
+- Linux UI
+  - Fix several places that hardcoded a light background/text color
+    instead of deferring to the L&F, which under GTKLookAndFeel's dark
+    theme meant either invisible text (light text on light background)
+    or a light "badge" that didn't blend with the rest of a dark theme.
+    Affected: the ECU definition tree's ROM/table entries (now use the
+    tree's own selection/text colors like the rest of the tree), and two
+    dropdowns in Settings. Verified against both light and dark GTK
+    themes, switched live via gsettings.
+  - Widen the ECU Editor's tree/table splitter further, from 6px to 10px:
+    6px was still reported as hard to grab reliably.
+
 
 1.1.5 JUL20 2026 Notes (2026-07-20)
 ------------------------------------

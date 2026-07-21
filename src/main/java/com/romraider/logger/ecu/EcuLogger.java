@@ -2155,7 +2155,7 @@ public final class EcuLogger extends AbstractFrame implements MessageListener {
         });
     }
 
-    private static void doCreateAndShowGui(int defaultCloseOperation, EcuLogger ecuLogger, boolean fullscreen) {
+    private static void doCreateAndShowGui(int defaultCloseOperation, final EcuLogger ecuLogger, boolean fullscreen) {
         Settings settings = ecuLogger.getSettings();
 
         // set window properties
@@ -2181,9 +2181,14 @@ public final class EcuLogger extends AbstractFrame implements MessageListener {
             ecuLogger.setIconImage(new ImageIcon(ICON_PATH).getImage());
             ecuLogger.setSize(settings.getLoggerWindowSize());
             ecuLogger.setLocation(settings.getLoggerWindowLocation());
-            if (settings.isLoggerWindowMaximized()) ecuLogger.setExtendedState(MAXIMIZED_BOTH);
             ecuLogger.setDefaultCloseOperation(defaultCloseOperation);
             ecuLogger.setVisible(true);
+            if (settings.isLoggerWindowMaximized()) {
+                // Requested after setVisible(true) (see ECUEditor's
+                // constructor for the full explanation, including the
+                // known remaining limitation this doesn't fully resolve).
+                ecuLogger.setExtendedState(MAXIMIZED_BOTH);
+            }
         }
     }
 
