@@ -1,5 +1,8 @@
 # RomRaider
 
+> [!CAUTION]
+> **THIS IS CURRENTLY UNTESTED WITH A PHYSICAL ECU. I AM AWAITING DELIVERY OF A CABLE SO THAT THIS CAN BE TESTED ON REAL HARDWARE!**
+
 > **Note:** This is a fork of [RomRaider/RomRaider](https://github.com/RomRaider/RomRaider)
 > that adds native Linux packaging. If you're on Windows, get the official
 > builds from the upstream repo linked above instead.
