@@ -1,4 +1,4 @@
-                - RomRaider 1.1.6 JUL20 2026 -
+                - RomRaider 1.1.7 JUL21 2026 -
       Open-Source ECU Tuning and Logging -- www.romraider.com
 
 
@@ -33,7 +33,7 @@ RomRaider is still in beta status and changing frequently,
 documentation may be incomplete or out of date.
 
 --------------------------------------------
-- 1.1.6 JUL20 2026 Notes (2026-07-20) -
+- 1.1.7 JUL21 2026 Notes (2026-07-21) -
 --------------------------------------------
 This is a release of RomRaider-Linux, a fork of RomRaider that adds native
 Linux packaging (.rpm, .deb, Flatpak) and Linux UI fixes on top of the
@@ -44,7 +44,7 @@ Upstream project (Windows builds):
 https://github.com/RomRaider/RomRaider
 
 --------------------------------------
-- 1.1.6 JUL20 2026 Known Issues -
+- 1.1.7 JUL21 2026 Known Issues -
 --------------------------------------
 - Editor / Logger (Linux)
   - On some XWayland/compositor setups, if the window was maximized when
@@ -65,6 +65,20 @@ Status of these items and more can be viewed at:
 --------------
 - Change Log -
 --------------
+
+1.1.7 JUL21 2026 Notes (2026-07-21)
+------------------------------------
+
+- Logger
+  - Remove the Innovate LM2 via MTS Link plugin from the Linux builds'
+    Plugins menu. It talks to Innovate's MTS Link software through
+    com4j, a Java-to-COM bridge, so it could never work on Linux;
+    plugins are discovered by scanning the plugins/ folder at runtime,
+    so simply not shipping this one file keeps it from showing up as a
+    selectable (but non-functional) option at all. Every other external
+    logger plugin (AEM, PLX, 14Point7, Phidgets, Zeitronix, TechEdge,
+    the regular serial Innovate plugin, etc.) is unaffected.
+
 
 1.1.6 JUL20 2026 Notes (2026-07-20)
 ------------------------------------

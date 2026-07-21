@@ -3,6 +3,17 @@
 > [!CAUTION]
 > **THIS IS CURRENTLY UNTESTED WITH A PHYSICAL ECU. I AM AWAITING DELIVERY OF A CABLE SO THAT THIS CAN BE TESTED ON REAL HARDWARE!**
 
+> [!WARNING]
+> **Known limitation: Innovate LM2 via MTS Link**
+>
+> The Innovate LM2 external logger plugin (`Lm2MtsDataSource`) talks to
+> Innovate's MTS Link software through `com4j`, a Java-to-COM bridge — COM
+> is a Windows-only technology, so this specific plugin does not work on
+> Linux, on any of the Linux packages above. It fails gracefully (logged
+> as an error, doesn't crash the app) and every other external logger
+> plugin (AEM, PLX, 14Point7, Phidgets, Zeitronix, TechEdge, etc.) is
+> unaffected, since those use serial/USB rather than Windows COM.
+
 > **Note:** This is a fork of [RomRaider/RomRaider](https://github.com/RomRaider/RomRaider)
 > that adds native Linux packaging. If you're on Windows, get the official
 > builds from the upstream repo linked above instead.
@@ -132,8 +143,8 @@ Other useful menus:
 - `Tools > Learning Table Values` — view the ECU's adaptive learning
   tables.
 - `Plugins` — external logger hardware (AEM, PLX, 14Point7, Phidgets,
-  Zeitronix, TechEdge, etc. — see the known limitation below for the one
-  plugin that doesn't work on Linux).
+  Zeitronix, TechEdge, etc. — see the warning near the top of this page
+  about the one plugin that isn't available on Linux).
 
 ### Definition auto-loading
 
@@ -164,16 +175,6 @@ you've picked a definition (whether via auto-load or manually), that
 choice sticks across restarts. To go back to relying on auto-load, clear
 the configured file from the settings dialogs above, or delete
 `~/.RomRaider/settings.xml` to reset all settings.
-
-### Known limitation: Innovate LM2 via MTS Link
-
-The Innovate LM2 external logger plugin (`Lm2MtsDataSource`) talks to
-Innovate's MTS Link software through `com4j`, a Java-to-COM bridge — COM is
-a Windows-only technology, so **this specific plugin does not work on
-Linux**, on any of the Linux packages above. It fails gracefully (logged as
-an error, doesn't crash the app) and every other external logger plugin
-(AEM, PLX, 14Point7, Phidgets, Zeitronix, TechEdge, etc.) is unaffected,
-since those use serial/USB rather than Windows COM.
 
 See the following links for further information:
 

@@ -339,8 +339,14 @@
         <copy todir="${jpackage.input.dir}/lib/linux/64">
             <fileset dir="lib/linux/64" />
         </copy>
+        <!-- Exclude the Innovate LM2/MTS Link plugin: it talks to MTS Link
+             through com4j, a Java-to-COM bridge, and COM is Windows-only.
+             Plugins are discovered purely by scanning this directory at
+             runtime (ExternalDataSourceLoaderImpl), so simply not shipping
+             this file keeps it out of the Plugins menu entirely on Linux,
+             rather than letting users pick it and hit a runtime error. -->
         <copy todir="${jpackage.input.dir}/plugins">
-            <fileset dir="plugins" />
+            <fileset dir="plugins" excludes="lm2_mts.plugin" />
         </copy>
         <copy todir="${jpackage.input.dir}/customize">
             <fileset dir="customize" />
