@@ -22,8 +22,9 @@ See Building_RomRaider.txt for information on generating usable binaries.
 | ------------------------------------------------------------------------------------------------- |
 | ![RomRaider Logger showing the full list of loggable ECU parameters](docs/screenshots/logger.png) |
 
-All three screenshots are from this fork's native Linux build (Fedora/KDE,
-Nimbus look and feel with native window decorations).
+All three screenshots are from this fork's native Linux build (Fedora/KDE),
+using GTKLookAndFeel with native window decorations — the interface follows
+your system's GTK light/dark theme automatically.
 
 ## Linux packaging
 
@@ -60,20 +61,76 @@ RomRaiderLogger   # Datalogger - connect to a running ECU over serial/USB
 On first launch, the Editor will prompt you to configure an ECU definition
 file, and the Logger will prompt for a logger definition file — see
 [Definition auto-loading](#definition-auto-loading) below to skip that
-prompt entirely. Typical workflow in the Editor:
+prompt entirely.
+
+#### ECU Editor
 
 1. `File > Open Image...` and select a `.bin`/`.hex` ROM dump.
 2. Expand a category in the definition tree on the left (e.g. `Fueling`,
    `Ignition Timing`, `Boost Control`) and press Enter/double-click a table
    to open it.
 3. Tables are color-coded (a red/green/blue heatmap) so outlying values
-   stand out at a glance; edit cells directly or use the toolbar's
-   increment/decrement/interpolate tools.
-4. `File > Save Image...` writes your changes back out to a `.bin`.
+   stand out at a glance:
+   - Edit cells directly, or select a range and use the toolbar's `Set`
+     (set to an exact value), `Mul` (multiply by a percentage), or the
+     fine/coarse increment-decrement arrows.
+   - `Edit > Vertical Interpolate` / `Horizontal Interpolate` / `Interpolate`
+     smooths a range of cells between two edited endpoints.
+   - The color-wheel toolbar icon toggles axis coloring; the `3D` icon
+     opens an interactive 3D plot of the table.
+   - `Table > Compare` diffs the table against its original/revert-point
+     values, another open ROM, or a specific table in another ROM.
+4. `Edit > Undo Selected Changes` / `Undo All Changes` / `Set Revert Point`
+   manage your edit history per-table.
+5. `File > Save Image...` (or `Save Image As...`) writes your changes back
+   out to a `.bin`.
 
-In the Logger, tick the checkboxes next to the parameters you want to
-monitor, choose the correct `COM Port`, then `Start file log` to begin
-logging to disk while connected to a vehicle.
+Other useful menus:
+
+- `Definitions > Definition Manager...` — add, remove, or reorder the ECU
+  definition files RomRaider searches when identifying a ROM (see
+  [Definition auto-loading](#definition-auto-loading) below).
+- `Definitions > Get Definitions...` — fetch updated definitions.
+- `Edit > Compare Images...` — open a side-by-side diff of two ROM files.
+- `Edit > Convert Image` — convert a ROM between 160KB and 192KB sizes.
+- `View > User Level` — raise the visible table complexity for advanced
+  tuning (definitions can mark tables as requiring a higher user level).
+- `Logger > Launch Logger...` — open the Logger from within the Editor.
+- `Tools > Dataflow Simulations...` — visualize how sensor inputs flow
+  into calculated ECU values.
+- `Edit > RomRaider Settings...` — general behavior, table display (cell
+  colors/size/font), clipboard format, toolbar icon set, and UI scaling.
+
+#### RomRaider Logger
+
+1. Under the `Parameters` (or `Switches` / `External Sensors`) tab on the
+   left, tick the checkboxes next to the values you want to monitor. Some
+   rows have a units dropdown (e.g. AFR vs. Lambda) you can change inline.
+2. Pick the correct `COM Port` at the top and make sure `ECU` (or `TCU`)
+   is checked, then connect your cable with the ignition on.
+3. Switch between the tabs along the bottom to view the data differently:
+   - `Data` — live table of current/min/max values (shown by default).
+   - `Graph` — real-time line graphs of selected parameters.
+   - `Dashboard` — configurable gauges.
+   - `MAF` / `Injector` — dedicated MAF and injector scaling/tuning views.
+   - `Dyno` — calculates horsepower/torque from logged acceleration runs.
+4. Set a `Logfile Text` prefix and click `Start file log` to record to
+   disk; `Reset Data` clears the min/max columns without stopping.
+
+Other useful menus:
+
+- `Settings > Logger Definition Location...` — point at a different
+  logger definition file (see
+  [Definition auto-loading](#definition-auto-loading) below).
+- `Settings > Log File Output Location...` — where log files are saved.
+- `Tools > Reset ECU` / `Read Diagnostic Codes` — quick ECU actions.
+- `Tools > Global Timing & Idle RPM Adjustment` — adjust timing/idle
+  targets live without editing the ROM.
+- `Tools > Learning Table Values` — view the ECU's adaptive learning
+  tables.
+- `Plugins` — external logger hardware (AEM, PLX, 14Point7, Phidgets,
+  Zeitronix, TechEdge, etc. — see the known limitation below for the one
+  plugin that doesn't work on Linux).
 
 ### Definition auto-loading
 
