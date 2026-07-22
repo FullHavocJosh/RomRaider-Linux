@@ -79,6 +79,8 @@ prompt entirely.
 
 #### ECU Editor
 
+![ECU Editor with a ROM image loaded, showing the definition tree](docs/screenshots/ecu-editor.png)
+
 1. `File > Open Image...` and select a `.bin`/`.hex` ROM dump.
 2. Expand a category in the definition tree on the left (e.g. `Fueling`,
    `Ignition Timing`, `Boost Control`) and press Enter/double-click a table
@@ -94,6 +96,9 @@ prompt entirely.
      opens an interactive 3D plot of the table.
    - `Table > Compare` diffs the table against its original/revert-point
      values, another open ROM, or a specific table in another ROM.
+
+   ![A 3D tuning table open, showing the heatmap coloring used to visualize values](docs/screenshots/tuning-table.png)
+
 4. `Edit > Undo Selected Changes` / `Undo All Changes` / `Set Revert Point`
    manage your edit history per-table.
 5. `File > Save Image...` (or `Save Image As...`) writes your changes back
@@ -116,6 +121,8 @@ Other useful menus:
   colors/size/font), clipboard format, toolbar icon set, and UI scaling.
 
 #### RomRaider Logger
+
+![RomRaider Logger showing the full list of loggable ECU parameters](docs/screenshots/logger.png)
 
 1. Under the `Parameters` (or `Switches` / `External Sensors`) tab on the
    left, tick the checkboxes next to the values you want to monitor. Some
@@ -159,8 +166,7 @@ per-user folder:
 
 If a file is present there _and_ no definition is already configured in
 your settings, it's loaded automatically and silently — no dialog, no
-manual setup. Definitions for your vehicle can be obtained from
-[RomRaider/SubaruDefs](https://github.com/RomRaider/SubaruDefs).
+manual setup.
 
 **To override this** (use a different definition than the auto-loaded
 one, or switch vehicles), you don't need to touch the files in
@@ -176,8 +182,68 @@ choice sticks across restarts. To go back to relying on auto-load, clear
 the configured file from the settings dialogs above, or delete
 `~/.RomRaider/settings.xml` to reset all settings.
 
-See the following links for further information:
+## Where to get definitions, base ROMs, and a cable
 
-- http://www.romraider.com/
-- http://www.romraider.com/forum/
-- https://github.com/RomRaider/RomRaider
+RomRaider edits and logs ROM files — it doesn't ship any, and (like
+upstream RomRaider) it doesn't read from or write to the ECU itself. You
+need three separate things before you can tune your own car:
+
+### 1. ECU, logger, and car definition files
+
+Definitions describe the memory layout of a given ECU (or the fields a
+logger can read) so RomRaider knows what it's looking at. The
+RomRaider forums are the canonical source, and are the same links used
+by the app's own `Get Definitions...` menu item:
+
+- [ECU definitions](https://www.romraider.com/forum/topic360.html) —
+  for the Editor (`~/.RomRaider/definitions/ecu_defs.xml`)
+- [Logger definitions](https://www.romraider.com/forum/topic1642.html) —
+  for the Logger (`~/.RomRaider/definitions/logger.xml`)
+- [Car definitions](https://www.romraider.com/forum/topic5792.html) —
+  vehicle-specific metadata used by both
+
+A maintained, browsable copy of the ECU definitions also lives on GitHub
+at [RomRaider/SubaruDefs](https://github.com/RomRaider/SubaruDefs), which
+can be more convenient than the forum thread if you want to `git clone`
+or search by ECU ID.
+
+### 2. A base ROM to edit
+
+RomRaider only edits a ROM file that's already on disk — getting one off
+your car (and writing an edited one back) is a separate step done with
+[EcuFlash](https://www.tactrix.com/index.php?Itemid=58) (background at
+[OpenECU.org](http://www.openecu.org/index.php?title=EcuFlash)), a free
+tool built for exactly this, using the cable below:
+
+1. Connect the cable to your car's OBD-II port with the ignition on.
+2. In EcuFlash, read the ECU to pull down your current (stock or
+   previously-tuned) calibration as a `.bin`/`.hex` file — **always keep
+   this original file** as a revert point.
+3. Open that file in RomRaider's Editor to make your changes and save it
+   under a new name.
+4. Back in EcuFlash, write the edited file to the ECU to flash it.
+
+RomRaider itself is never talking to the car during this — it only ever
+reads/writes the `.bin`/`.hex` file on disk, so there's no risk of a bad
+flash regardless of what RomRaider is doing.
+
+### 3. A cable
+
+The long-standing standard for Subaru SSM read/write (and what EcuFlash
+and RomRaider's Logger both expect) is the **Tactrix Openport 2.0**,
+available from [tactrix.com](https://www.tactrix.com/). Tactrix has had
+supply gaps on the 2.0 and is currently bringing up its successor,
+**Openport 3.0** — check their site for current stock. Be wary of cheap
+unofficial "Openport" clones sold on eBay/AliExpress; they're common and
+can behave unpredictably during a flash.
+
+### Community & support
+
+- [RomRaider forums](https://www.romraider.com/forum/) — definitions,
+  base maps, and general tuning help
+- [NASIOC](https://forums.nasioc.com/) and
+  [IWSTI](https://www.iwsti.com/) — large North American Subaru
+  enthusiast communities with active tuning sections
+- [ScoobyNet](https://www.scoobynet.com/) — UK/European Subaru community
+- [RomRaider/RomRaider](https://github.com/RomRaider/RomRaider) —
+  upstream project (this repo is a Linux-packaging fork of it)
