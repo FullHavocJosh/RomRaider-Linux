@@ -14,6 +14,13 @@ done
 # resolves the i18n/ directory relative to the process CWD, not the classpath.
 cd "$APPDIR"
 
+# Works around a Swing/AWT bug where table and other content panes render
+# solid black under some XWayland compositors (observed on KDE/KWin) unless
+# this is set. It has to be a real process environment variable -- AWT's
+# native X11 code reads it via getenv(), so it can't be passed as a JVM
+# -D system property alongside the -D flags below.
+export _JAVA_AWT_WM_NONREPARENTING=1
+
 exec /app/jre/bin/java \
     -Djava.library.path="$APPDIR/lib/linux/64" \
     -Dawt.useSystemAAFontSettings=lcd \

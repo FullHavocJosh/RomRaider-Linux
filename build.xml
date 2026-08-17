@@ -514,6 +514,12 @@
                   tofile="${jpackage.appimage.dir}/${name.package}/lib/app/@{launcher}.bin.cfg" />
             <echo file="${jpackage.appimage.dir}/${name.package}/bin/@{launcher}"><![CDATA[#!/bin/sh
 cd "$(dirname "$0")/../lib/app" || exit 1
+# Works around a Swing/AWT bug where table and other content panes render
+# solid black under some XWayland compositors (observed on KDE/KWin) unless
+# this is set. It has to be a real process environment variable -- AWT's
+# native X11 code reads it via getenv(), so it can't be passed as a JVM
+# -D system property through jpackage's --java-options.
+export _JAVA_AWT_WM_NONREPARENTING=1
 exec "$(dirname "$0")/@{launcher}.bin" "$@"
 ]]></echo>
             <chmod file="${jpackage.appimage.dir}/${name.package}/bin/@{launcher}" perm="755" />

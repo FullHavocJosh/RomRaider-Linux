@@ -1,7 +1,13 @@
 # RomRaider
 
-> [!CAUTION]
-> **THIS IS CURRENTLY UNTESTED WITH A PHYSICAL ECU. I AM AWAITING DELIVERY OF A CABLE SO THAT THIS CAN BE TESTED ON REAL HARDWARE!**
+> [!NOTE]
+> **Confirmed working against real hardware**: a 2007 Subaru (Legacy
+> GT/Outback XT-generation, EJ255, CAN-bus SSM) over a genuine Tactrix
+> OpenPort 2.0, using this fork's native Linux build. Getting there on a
+> MY2007+ car needs two Linux-specific setup steps (cable group
+> permissions, and a J2534 driver for CAN-bus SSM) — see
+> [Linux: cable permissions and the CAN-bus (MY2007+) driver](#4-linux-cable-permissions-and-the-can-bus-my2007-driver)
+> below.
 
 > [!WARNING]
 > **Known limitation: Innovate LM2 via MTS Link**
@@ -236,6 +242,100 @@ supply gaps on the 2.0 and is currently bringing up its successor,
 **Openport 3.0** — check their site for current stock. Be wary of cheap
 unofficial "Openport" clones sold on eBay/AliExpress; they're common and
 can behave unpredictably during a flash.
+
+### 4. Linux: cable permissions and the CAN-bus (MY2007+) driver
+
+Two Linux-specific things stand between a fresh install and an actual
+working connection to the car — found and fixed while bringing up this
+fork against a real 2007 Subaru ECU.
+
+#### `dialout` group membership (any car, any year)
+
+The OpenPort 2.0 shows up as a serial device (e.g. `/dev/ttyACM0`), owned
+`root:dialout` with `660` permissions. Without group membership, the
+Logger can still _open_ the port, but every connection attempt fails —
+nothing in the UI points at a permissions problem specifically.
+
+```sh
+sudo usermod -aG dialout $USER
+```
+
+**Log out and back in (or reboot)** afterward — group membership only
+applies to new login sessions, not your current shell.
+
+#### J2534 driver (MY2007+ vehicles, CAN-bus SSM)
+
+Subaru moved the SSM diagnostic bus from K-Line to CAN starting around
+model year 2007. RomRaider's raw-serial fallback only implements K-Line
+(ISO9141) framing, so against a CAN-only ECU the Logger connects to the
+port fine but the init handshake gets no response, and `CAL ID`/`ECU ID`
+stay `Unknown` no matter which transport you pick under
+`Settings > Select Logging Protocol Options...`.
+`~/.RomRaider/rr_system.log` gives it away:
+
+```
+Linux Openport 2.0 library not found at: /usr/local/lib/j2534.so
+...
+Trying serial connection...
+Error sending init: Parameter response must not be null or empty
+```
+
+Tactrix never shipped a Linux J2534 driver for the OpenPort 2.0 — it's a
+Windows-only DLL. [NikolaKozina/j2534](https://github.com/NikolaKozina/j2534)
+is an open-source reimplementation built specifically for this cable and
+against RomRaider's own J2534 calls, and it installs to exactly the path
+`j2534Libraries.properties` already checks by default:
+
+```sh
+# Fedora/RHEL
+sudo dnf install gcc make pkgconf-pkg-config libusb1-devel
+# Debian/Ubuntu
+sudo apt install gcc make pkg-config libusb-1.0-0-dev
+
+git clone https://github.com/NikolaKozina/j2534.git
+cd j2534/j2534
+make
+sudo make install    # installs j2534.so to /usr/local/lib/
+```
+
+If `make install` errors on `/usr/lib/pkgconfig` (some distros —
+including Fedora/Nobara — use `/usr/lib64/pkgconfig` instead), that step
+is cosmetic; it only matters for other software that locates this library
+via `pkg-config`, which RomRaider doesn't. Just make sure `j2534.so`
+itself lands in `/usr/local/lib/`:
+
+```sh
+sudo mkdir -p /usr/local/lib
+sudo cp j2534.so /usr/local/lib/j2534.so
+sudo ldconfig
+```
+
+The library talks to the cable directly over `libusb`, bypassing the
+kernel's `cdc_acm` serial driver, so it also needs its own udev rule
+granting access to the raw USB device (separate from the `dialout` rule
+that covers the `/dev/ttyACM0` node):
+
+```sh
+sudo tee /etc/udev/rules.d/99-tactrix-openport2-j2534.rules <<'EOF'
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", ATTR{idProduct}=="cc4d", GROUP="dialout", MODE="0666"
+EOF
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
+Restart the Logger afterward — its startup log should show the driver
+being found and used, instead of the "library not found" messages:
+
+```
+J2534 Version => firmware: 1.17.4877, dll: 3.0.1 (libusb-1.0.30.12037), api: 04.04
+J2534/ISO9141 connection initialised
+ECU ID = ...
+CAL ID: ..., Car: ...
+```
+
+Pre-2007 vehicles that only need K-Line SSM should work over the raw
+serial fallback without any of this — the driver closes the CAN-bus gap
+specifically.
 
 ### Community & support
 
